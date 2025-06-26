@@ -13,8 +13,50 @@
 	const api = { getAccel, setLightByAngle };
 	const apiArg = `{${Object.keys(api).join(',')}}`;
 
+	async function connectQBead() {
+		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
+
+		let accUuid = 'e30c1fc9-359c-12be-2544-63d6aa088d45';
+		let sphUuid = 'e30c1fc8-359c-12be-2544-63d6aa088d45';
+		let colUuid = 'e30c1fc7-359c-12be-2544-63d6aa088d45';
+
+		console.log('Requesting Bluetooth Device...');
+		let device = await (navigator as any).bluetooth.requestDevice({
+			filters: [{ services: [serviceUuid] }]
+		});
+		console.log('Connecting to GATT Server...');
+		let server = await device.gatt.connect();
+
+		console.log('Getting Service...');
+		let service = await server.getPrimaryService(serviceUuid);
+
+		console.log('Getting Characteristics...');
+
+		let sphCharacteristic = await service.getCharacteristic(sphUuid);
+		let colCharacteristic = await service.getCharacteristic(colUuid);
+		let accCharacteristic = await service.getCharacteristic(accUuid);
+		await accCharacteristic.startNotifications();
+		console.log('> Notifications started');
+		accCharacteristic.addEventListener('characteristicvaluechanged', (event: any) => {
+			new Uint8Array(event.target.value.buffer).reverse();
+			let value = event.target.value;
+			qBeads[device.id].accel = {
+				x: value.getFloat32(0),
+				y: value.getFloat32(4),
+				z: value.getFloat32(8)
+			};
+		});
+
+		qBeads[device.id] = {
+			sphCharacteristic,
+			colCharacteristic,
+			accCharacteristic,
+			accel: { x: 0, y: 0, z: 0 }
+		};
+	}
+
 	let idCounter = $state(0);
-	function connectQBead() {
+	function connectQBeadMock() {
 		const id = (idCounter++).toString();
 		qBeads[id] = {
 			accel: { x: 0, y: 0, z: 0 },
