@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { v4 as uuid } from 'uuid';
 	import Handler from './Handler.svelte';
 
 	let qBeads = $state<Record<string, any>>({});
@@ -13,9 +14,9 @@
 	const api = { getAccel, setLightByAngle };
 	const apiArg = `{${Object.keys(api).join(',')}}`;
 
-	let idCounter = $state(0);
+	// let idCounter = $state(0);
 	function connectQBead() {
-		const id = (idCounter++).toString();
+		const id = uuid();
 		qBeads[id] = {
 			accel: { x: 0, y: 0, z: 0 },
 			lightIndex: [0, 0],
