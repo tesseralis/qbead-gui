@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { v4 as uuid } from 'uuid';
 	import Handler from './Handler.svelte';
+	import 'core-js/features/symbol/observable.js';
+	import BlochSphere from './BlochSphere.svelte';
+	import { BlochVector } from '@qbead/bloch-sphere';
 
 	let qBeads = $state<Record<string, any>>({});
 	function getAccel(id: string) {
@@ -18,16 +21,16 @@
 	function connectQBead() {
 		const id = uuid();
 		qBeads[id] = {
-			accel: { x: 0, y: 0, z: 0 },
+			accel: { x: 0, y: 0, z: -1 },
 			lightIndex: [0, 0],
 			color: 'black'
 		};
 
 		setInterval(() => {
 			qBeads[id].accel = {
-				x: clamp((qBeads[id].x ?? 0) + (Math.random() - 0.5), -1, 1),
-				y: clamp((qBeads[id].y ?? 0) + (Math.random() - 0.5), -1, 1),
-				z: clamp((qBeads[id].z ?? 0) + (Math.random() - 0.5), -1, 1)
+				x: clamp((qBeads[id].x ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1),
+				y: clamp((qBeads[id].y ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1),
+				z: clamp((qBeads[id].z ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1)
 			};
 		}, 150);
 
@@ -65,10 +68,11 @@
 						3
 					)}
 				</p>
-				<!-- TODO replace with actual visualizer -->
-				<svg class="visualizer" viewBox="-50 -50 100 100">
-					<circle r="40" stroke="black" fill={qbead.color} />
-				</svg>
+				<BlochSphere
+					vector={(
+						BlochVector.from(qbead.accel.x, qbead.accel.y, qbead.accel.z) as any
+					).normalize()}
+				/>
 				<Handler
 					title="onAccelUpdate"
 					onapply={(text) => {
