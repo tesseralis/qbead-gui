@@ -7,6 +7,7 @@
 	import { Color, type ColorRepresentation } from 'three';
 
 	interface QBeadState {
+		name: string;
 		accel: BlochVector;
 		sphereCoord?: BlochVector;
 		color?: ColorRepresentation;
@@ -85,6 +86,7 @@
 		});
 
 		qBeads[device.id] = {
+			name: device.name,
 			sphCharacteristic,
 			colCharacteristic,
 			accCharacteristic,
@@ -99,6 +101,7 @@
 	<div class="qBeadPanels">
 		{#each Object.entries(qBeads) as [id, qbead]}
 			<section class="qBeadPanel">
+				<h3>{qbead.name}</h3>
 				<p>{id}<button onclick={() => navigator.clipboard.writeText(id)}>copy</button></p>
 				<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
 				<p>
