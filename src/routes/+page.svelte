@@ -1,17 +1,35 @@
 <script lang="ts">
+	import { v4 as uuid } from 'uuid';
 	import Handler from './Handler.svelte';
+	import 'core-js/features/symbol/observable.js';
+	import BlochSphere from './BlochSphere.svelte';
+	import { BlochVector } from '@qbead/bloch-sphere';
+	import Docs from './Docs.svelte';
 
-	let qBeads = $state<Record<string, any>>({});
+	interface QBeadState {
+		// accel: BlochVector;
+		accel: any; // FIXME should be BlochVector
+		point?: any; // FIXME should be BlochVector
+		color?: any;
+		sphCharacteristic: any;
+		accCharacteristic: any;
+		colCharacteristic: any;
+		onTap?: Function;
+		onAccelUpdate?: Function;
+	}
+
+	let qBeads = $state<Record<string, QBeadState>>({});
 	function getAccel(id: string) {
-		return qBeads[id]?.accel;
+		return qBeads[id].accel;
 	}
 
 	// TODO affect phi and theta
-	function setLightByAngle(id: string, phi: number, theta: number, color: string) {
+	function setLightByAngle(id: string, theta: number, phi: number, color: string) {
+		qBeads[id].point = BlochVector.fromAngles(theta, phi);
 		qBeads[id].color = color;
 	}
 	const api = { getAccel, setLightByAngle };
-	const apiArg = `{${Object.keys(api).join(',')}}`;
+	const apiArg = `{${Object.keys(api).join(',')}, self }`;
 
 	async function connectQBead() {
 		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
@@ -56,60 +74,43 @@
 	}
 
 	let idCounter = $state(0);
-	function connectQBeadMock() {
-		const id = (idCounter++).toString();
-		qBeads[id] = {
-			accel: { x: 0, y: 0, z: 0 },
-			lightIndex: [0, 0],
-			color: 'black'
-		};
+	// function connectQBeadMock() {
+	// 	const id = (idCounter++).toString();
+	// 	qBeads[id] = {
+	// 		accel: BlochVector.from(0, 0, -1),
+	// 		// lightIndex: [0, 0],
+	// 		color: 'black'
+	// 	};
 
-		setInterval(() => {
-			qBeads[id].accel = {
-				x: clamp((qBeads[id].x ?? 0) + (Math.random() - 0.5), -1, 1),
-				y: clamp((qBeads[id].y ?? 0) + (Math.random() - 0.5), -1, 1),
-				z: clamp((qBeads[id].z ?? 0) + (Math.random() - 0.5), -1, 1)
-			};
-		}, 150);
+	// 	setInterval(() => {
+	// 		qBeads[id].accel = BlochVector.from(
+	// 			clamp((qBeads[id].accel.x ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+	// 			clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+	// 			clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
+	// 		);
+	// 		qBeads[id].onAccelUpdate?.({ ...api, self: id });
+	// 	}, 150);
 
-		function clamp(n: number, min: number, max: number) {
-			return Math.max(min, Math.min(max, n));
-		}
-	}
+	// 	function clamp(n: number, min: number, max: number) {
+	// 		return Math.max(min, Math.min(max, n));
+	// 	}
+	// }
 </script>
 
 <div>
-	<details>
-		<summary>API</summary>
-		<ul>
-			<li>
-				<code>getAccel(id: string)</code> - gets the acceleration data of the QBead a
-				<code>{`{x, y, z}`}</code> object.
-			</li>
-			<li>
-				<code> setLightByAngle(id: string, phi: number, theta: number, color: string) </code> - set
-				the color of the QBead with the given angle and color string. Any
-				<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value" target="blank">
-					color accepted by CSS
-				</a> is available.
-			</li>
-		</ul>
-	</details>
+	<Docs />
 	<button onclick={connectQBead}>+ Add QBead</button>
 	<div class="qBeadPanels">
 		{#each Object.entries(qBeads) as [id, qbead]}
 			<section class="qBeadPanel">
-				<p>{id}</p>
-				<button onclick={() => qbead.onTap?.(api)}>Tap</button>
+				<p>{id}<button onclick={() => navigator.clipboard.writeText(id)}>copy</button></p>
+				<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
 				<p>
 					x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
 						3
 					)}
 				</p>
-				<!-- TODO replace with actual visualizer -->
-				<svg class="visualizer" viewBox="-50 -50 100 100">
-					<circle r="40" stroke="black" fill={qbead.color} />
-				</svg>
+				<BlochSphere vector={qbead.accel} point={qbead.point} color={qbead.color} />
 				<Handler
 					title="onAccelUpdate"
 					onapply={(text) => {
