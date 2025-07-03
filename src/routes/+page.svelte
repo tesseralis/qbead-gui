@@ -16,12 +16,12 @@
 
 	let qBeads = $state<Record<string, QBeadState>>({});
 	function getAccel(id: string) {
-		return qBeads?.accel;
+		return qBeads[id].accel;
 	}
 
 	// TODO affect phi and theta
-	function setLightByAngle(id: string, phi: number, theta: number, color: string) {
-		qBeads[id].point = BlochVector.fromAngles(phi, theta);
+	function setLightByAngle(id: string, theta: number, phi: number, color: string) {
+		qBeads[id].point = BlochVector.fromAngles(theta, phi);
 		qBeads[id].color = color;
 	}
 	const api = { getAccel, setLightByAngle };
@@ -42,6 +42,7 @@
 				clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
 				clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
 			);
+			qBeads[id].onAccelUpdate?.(api);
 		}, 150);
 
 		function clamp(n: number, min: number, max: number) {
@@ -55,8 +56,10 @@
 		<summary>API</summary>
 		<ul>
 			<li>
-				<code>getAccel(id: string)</code> - gets the acceleration data of the QBead a
-				<code>{`{x, y, z}`}</code> object.
+				<code>getAccel(id: string)</code> - gets the acceleration data of the QBead as a
+				<a href="https://qbead.gitbook.io/bloch-sphere/classes/blochvector">
+					<code>BlochVector</code>
+				</a>.
 			</li>
 			<li>
 				<code> setLightByAngle(id: string, phi: number, theta: number, color: string) </code> - set
@@ -78,11 +81,7 @@
 						3
 					)}
 				</p>
-				<BlochSphere
-					vector={qbead.accel.clone().normalize()}
-					point={qbead.point}
-					color={qbead.color}
-				/>
+				<BlochSphere vector={qbead.accel} point={qbead.point} color={qbead.color} />
 				<Handler
 					title="onAccelUpdate"
 					onapply={(text) => {
