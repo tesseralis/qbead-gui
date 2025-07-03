@@ -28,8 +28,8 @@
 
 <style>
 	.bloch-sphere {
-		width: 600px;
-		height: 600px;
+		width: 400px;
+		height: 400px;
 		position: relative;
 	}
 </style>
