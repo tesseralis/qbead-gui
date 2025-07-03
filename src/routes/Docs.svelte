@@ -2,6 +2,9 @@
 	<summary>API</summary>
 	<ul>
 		<li>
+			<code>self</code> - the id of the current QBead.
+		</li>
+		<li>
 			<code>getAccel(id: string)</code> - gets the acceleration data of the QBead as a
 			<a href="https://qbead.gitbook.io/bloch-sphere/classes/blochvector">
 				<code>BlochVector</code>

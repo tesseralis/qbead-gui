@@ -26,7 +26,7 @@
 		qBeads[id].color = color;
 	}
 	const api = { getAccel, setLightByAngle };
-	const apiArg = `{${Object.keys(api).join(',')}}`;
+	const apiArg = `{${Object.keys(api).join(',')}, self }`;
 
 	function connectQBead() {
 		const id = uuid();
@@ -42,7 +42,7 @@
 				clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
 				clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
 			);
-			qBeads[id].onAccelUpdate?.(api);
+			qBeads[id].onAccelUpdate?.({ ...api, self: id });
 		}, 150);
 
 		function clamp(n: number, min: number, max: number) {
@@ -58,7 +58,7 @@
 		{#each Object.entries(qBeads) as [id, qbead]}
 			<section class="qBeadPanel">
 				<p>{id}<button onclick={() => navigator.clipboard.writeText(id)}>copy</button></p>
-				<button onclick={() => qbead.onTap?.(api)}>Tap</button>
+				<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
 				<p>
 					x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
 						3
