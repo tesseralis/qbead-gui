@@ -4,12 +4,12 @@
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
 	import Docs from './Docs.svelte';
-	import { Color } from 'three';
+	import { Color, type ColorRepresentation } from 'three';
 
 	interface QBeadState {
 		accel: BlochVector;
-		point?: BlochVector;
-		color?: any;
+		sphereCoord?: BlochVector;
+		color?: ColorRepresentation;
 		sphCharacteristic: any;
 		accCharacteristic: any;
 		colCharacteristic: any;
@@ -22,9 +22,14 @@
 		return qBeads[id].accel;
 	}
 
-	async function setLightByAngle(id: string, theta: number, phi: number, color: string) {
+	async function setLightByAngle(
+		id: string,
+		theta: number,
+		phi: number,
+		color: ColorRepresentation
+	) {
 		const qBead = qBeads[id];
-		qBead.point = BlochVector.fromAngles(theta, phi);
+		qBead.sphereCoord = BlochVector.fromAngles(theta, phi);
 		qBead.color = color;
 		let newthetaphi = Uint8Array.of(
 			Math.floor((theta * 255) / Math.PI),
@@ -101,7 +106,7 @@
 						3
 					)}
 				</p>
-				<BlochSphere vector={qbead.accel} point={qbead.point} color={qbead.color} />
+				<BlochSphere accel={qbead.accel} sphereCoord={qbead.sphereCoord} color={qbead.color} />
 				<Handler
 					title="onAccelUpdate"
 					onapply={(text) => {
