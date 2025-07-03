@@ -8,12 +8,13 @@
 
 	interface QBeadState {
 		name: string;
+		loading?: boolean;
 		accel: BlochVector;
 		sphereCoord?: BlochVector;
 		color?: ColorRepresentation;
-		sphCharacteristic: any;
-		accCharacteristic: any;
-		colCharacteristic: any;
+		sphCharacteristic?: any;
+		accCharacteristic?: any;
+		colCharacteristic?: any;
 		onTap?: Function;
 		onAccelUpdate?: Function;
 	}
@@ -61,6 +62,11 @@
 		let device = await (navigator as any).bluetooth.requestDevice({
 			filters: [{ services: [serviceUuid] }]
 		});
+		qBeads[device.id] = {
+			name: device.name,
+			accel: BlochVector.from(0, 0, -1),
+			loading: true
+		};
 		console.log('Connecting to GATT Server...');
 		let server = await device.gatt.connect();
 
@@ -103,25 +109,29 @@
 			<section class="qBeadPanel">
 				<h3>{qbead.name}</h3>
 				<p>{id}<button onclick={() => navigator.clipboard.writeText(id)}>copy</button></p>
-				<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
-				<p>
-					x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
-						3
-					)}
-				</p>
-				<BlochSphere accel={qbead.accel} sphereCoord={qbead.sphereCoord} color={qbead.color} />
-				<Handler
-					title="onAccelUpdate"
-					onapply={(text) => {
-						qBeads[id].onAccelUpdate = new Function(apiArg, text);
-					}}
-				/>
-				<Handler
-					title="onTap"
-					onapply={(text) => {
-						qBeads[id].onTap = new Function(apiArg, text);
-					}}
-				/>
+				{#if qbead.loading}
+					<p>Loading...</p>
+				{:else}
+					<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
+					<p>
+						x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
+							3
+						)}
+					</p>
+					<BlochSphere accel={qbead.accel} sphereCoord={qbead.sphereCoord} color={qbead.color} />
+					<Handler
+						title="onAccelUpdate"
+						onapply={(text) => {
+							qBeads[id].onAccelUpdate = new Function(apiArg, text);
+						}}
+					/>
+					<Handler
+						title="onTap"
+						onapply={(text) => {
+							qBeads[id].onTap = new Function(apiArg, text);
+						}}
+					/>
+				{/if}
 			</section>
 		{/each}
 	</div>
