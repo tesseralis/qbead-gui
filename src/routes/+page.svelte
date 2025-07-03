@@ -58,11 +58,12 @@
 		accCharacteristic.addEventListener('characteristicvaluechanged', (event: any) => {
 			new Uint8Array(event.target.value.buffer).reverse();
 			let value = event.target.value;
-			qBeads[device.id].accel = {
-				x: value.getFloat32(0),
-				y: value.getFloat32(4),
-				z: value.getFloat32(8)
-			};
+			qBeads[device.id].accel = BlochVector.from(
+				value.getFloat32(0),
+				value.getFloat32(4),
+				value.getFloat32(8)
+			);
+			qBeads[device.id].onAccelUpdate?.({ ...api, self: device.id });
 		});
 
 		qBeads[device.id] = {

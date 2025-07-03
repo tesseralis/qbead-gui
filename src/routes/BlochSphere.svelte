@@ -27,7 +27,7 @@
 	});
 
 	$effect(() => {
-		qubit.set(vector, 100);
+		qubit.set(vector);
 	});
 
 	$effect(() => {
