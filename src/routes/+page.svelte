@@ -5,7 +5,14 @@
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
 
-	let qBeads = $state<Record<string, any>>({});
+	interface QBeadState {
+		accel: { x: number; y: number; z: number };
+		color: any;
+		onTap?: Function;
+		onAccelUpdate?: Function;
+	}
+
+	let qBeads = $state<Record<string, QBeadState>>({});
 	function getAccel(id: string) {
 		return qBeads[id]?.accel;
 	}
@@ -22,15 +29,15 @@
 		const id = uuid();
 		qBeads[id] = {
 			accel: { x: 0, y: 0, z: -1 },
-			lightIndex: [0, 0],
+			// lightIndex: [0, 0],
 			color: 'black'
 		};
 
 		setInterval(() => {
 			qBeads[id].accel = {
-				x: clamp((qBeads[id].x ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1),
-				y: clamp((qBeads[id].y ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1),
-				z: clamp((qBeads[id].z ?? 0) + (1 / 32) * (Math.random() - 0.5), -1, 1)
+				x: clamp((qBeads[id].accel.x ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+				y: clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+				z: clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
 			};
 		}, 150);
 
@@ -72,6 +79,7 @@
 					vector={(
 						BlochVector.from(qbead.accel.x, qbead.accel.y, qbead.accel.z) as any
 					).normalize()}
+					color={qbead.color}
 				/>
 				<Handler
 					title="onAccelUpdate"
