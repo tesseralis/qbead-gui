@@ -6,7 +6,9 @@
 	import { BlochVector } from '@qbead/bloch-sphere';
 
 	interface QBeadState {
-		accel: { x: number; y: number; z: number };
+		// accel: BlochVector;
+		accel: any; // FIXME should be BlochVector
+		point?: any; // FIXME should be BlochVector
 		color: any;
 		onTap?: Function;
 		onAccelUpdate?: Function;
@@ -14,11 +16,12 @@
 
 	let qBeads = $state<Record<string, QBeadState>>({});
 	function getAccel(id: string) {
-		return qBeads[id]?.accel;
+		return qBeads?.accel;
 	}
 
 	// TODO affect phi and theta
 	function setLightByAngle(id: string, phi: number, theta: number, color: string) {
+		qBeads[id].point = BlochVector.fromAngles(phi, theta);
 		qBeads[id].color = color;
 	}
 	const api = { getAccel, setLightByAngle };
@@ -28,17 +31,17 @@
 	function connectQBead() {
 		const id = uuid();
 		qBeads[id] = {
-			accel: { x: 0, y: 0, z: -1 },
+			accel: BlochVector.from(0, 0, -1),
 			// lightIndex: [0, 0],
 			color: 'black'
 		};
 
 		setInterval(() => {
-			qBeads[id].accel = {
-				x: clamp((qBeads[id].accel.x ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
-				y: clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
-				z: clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
-			};
+			qBeads[id].accel = BlochVector.from(
+				clamp((qBeads[id].accel.x ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+				clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
+				clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
+			);
 		}, 150);
 
 		function clamp(n: number, min: number, max: number) {
@@ -76,9 +79,8 @@
 					)}
 				</p>
 				<BlochSphere
-					vector={(
-						BlochVector.from(qbead.accel.x, qbead.accel.y, qbead.accel.z) as any
-					).normalize()}
+					vector={qbead.accel.clone().normalize()}
+					point={qbead.point}
 					color={qbead.color}
 				/>
 				<Handler
