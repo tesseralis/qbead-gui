@@ -1,15 +1,14 @@
 <script lang="ts">
-	import { v4 as uuid } from 'uuid';
 	import Handler from './Handler.svelte';
 	import 'core-js/features/symbol/observable.js';
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
 	import Docs from './Docs.svelte';
+	import { Color } from 'three';
 
 	interface QBeadState {
-		// accel: BlochVector;
-		accel: any; // FIXME should be BlochVector
-		point?: any; // FIXME should be BlochVector
+		accel: BlochVector;
+		point?: BlochVector;
 		color?: any;
 		sphCharacteristic: any;
 		accCharacteristic: any;
@@ -23,11 +22,25 @@
 		return qBeads[id].accel;
 	}
 
-	// TODO affect phi and theta
-	function setLightByAngle(id: string, theta: number, phi: number, color: string) {
-		qBeads[id].point = BlochVector.fromAngles(theta, phi);
-		qBeads[id].color = color;
+	async function setLightByAngle(id: string, theta: number, phi: number, color: string) {
+		const qBead = qBeads[id];
+		qBead.point = BlochVector.fromAngles(theta, phi);
+		qBead.color = color;
+		let newthetaphi = Uint8Array.of(
+			Math.floor((theta * 255) / Math.PI),
+			Math.floor((phi * 255) / (2 * Math.PI))
+		);
+		await qBead.sphCharacteristic.writeValue(newthetaphi);
+		const col = new Color(color);
+
+		let newColor = Uint8Array.of(
+			Math.floor(col.r * 255),
+			Math.floor(col.g * 255),
+			Math.floor(col.b * 255)
+		);
+		await qBead.colCharacteristic.writeValue(newColor);
 	}
+
 	const api = { getAccel, setLightByAngle };
 	const apiArg = `{${Object.keys(api).join(',')}, self }`;
 
@@ -70,7 +83,7 @@
 			sphCharacteristic,
 			colCharacteristic,
 			accCharacteristic,
-			accel: { x: 0, y: 0, z: 0 }
+			accel: BlochVector.from(0, 0, -1)
 		};
 	}
 
