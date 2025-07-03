@@ -61,7 +61,7 @@
 	<div class="qBeadPanels">
 		{#each Object.entries(qBeads) as [id, qbead]}
 			<section class="qBeadPanel">
-				<p>{id}</p>
+				<p>{id}<button onclick={() => navigator.clipboard.writeText(id)}>copy</button></p>
 				<button onclick={() => qbead.onTap?.(api)}>Tap</button>
 				<p>
 					x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
