@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { BlochSphere, BlochVector, PointsDisplay, QubitDisplay } from '@qbead/bloch-sphere';
+	import type { ColorRepresentation } from 'three';
 
 	interface Props {
-		vector: BlochVector;
-		point?: BlochVector;
-		color?: any;
+		// The Bloch Sphere's current acceleration
+		accel: BlochVector;
+		// The current lit point
+		sphereCoord?: BlochVector;
+		color?: ColorRepresentation;
 	}
 
-	const { vector, point, color }: Props = $props();
+	const { accel: vector, sphereCoord: point, color }: Props = $props();
 	let container: HTMLElement | undefined = $state();
 	const blochSphere = new BlochSphere({ fontSize: 1.25 });
 	let qubit = new QubitDisplay();
@@ -27,7 +30,7 @@
 	});
 
 	$effect(() => {
-		qubit.set(vector, 100);
+		qubit.set(vector);
 	});
 
 	$effect(() => {
