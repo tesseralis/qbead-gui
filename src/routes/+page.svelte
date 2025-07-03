@@ -86,29 +86,6 @@
 			accel: BlochVector.from(0, 0, -1)
 		};
 	}
-
-	let idCounter = $state(0);
-	// function connectQBeadMock() {
-	// 	const id = (idCounter++).toString();
-	// 	qBeads[id] = {
-	// 		accel: BlochVector.from(0, 0, -1),
-	// 		// lightIndex: [0, 0],
-	// 		color: 'black'
-	// 	};
-
-	// 	setInterval(() => {
-	// 		qBeads[id].accel = BlochVector.from(
-	// 			clamp((qBeads[id].accel.x ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
-	// 			clamp((qBeads[id].accel.y ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1),
-	// 			clamp((qBeads[id].accel.z ?? 0) + (1 / 16) * (Math.random() - 0.5), -1, 1)
-	// 		);
-	// 		qBeads[id].onAccelUpdate?.({ ...api, self: id });
-	// 	}, 150);
-
-	// 	function clamp(n: number, min: number, max: number) {
-	// 		return Math.max(min, Math.min(max, n));
-	// 	}
-	// }
 </script>
 
 <div>
