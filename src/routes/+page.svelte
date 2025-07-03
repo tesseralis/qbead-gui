@@ -88,7 +88,7 @@
 				value.getFloat32(4),
 				value.getFloat32(8)
 			);
-			qBeads[device.id].onAccelUpdate?.({ ...api, self: device.id });
+			qBeads[device.id].onAccelUpdate?.();
 		});
 
 		qBeads[device.id] = {
@@ -112,7 +112,7 @@
 				{#if qbead.loading}
 					<p>Loading...</p>
 				{:else}
-					<button onclick={() => qbead.onTap?.({ ...api, self: id })}>Tap</button>
+					<button onclick={() => qbead.onTap?.()}>Tap</button>
 					<p>
 						x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(
 							3
@@ -122,13 +122,19 @@
 					<Handler
 						title="onAccelUpdate"
 						onapply={(text) => {
-							qBeads[id].onAccelUpdate = new Function(apiArg, text);
+							const func = new Function(apiArg, text);
+							qBeads[id].onAccelUpdate = () => {
+								func({ ...api, self: id });
+							};
 						}}
 					/>
 					<Handler
 						title="onTap"
 						onapply={(text) => {
-							qBeads[id].onTap = new Function(apiArg, text);
+							const func = new Function(apiArg, text);
+							qBeads[id].onTap = () => {
+								func({ ...api, self: id });
+							};
 						}}
 					/>
 				{/if}
