@@ -1,28 +1,35 @@
 <script lang="ts">
+	import { basicSetup } from 'codemirror';
+	import { EditorView } from '@codemirror/view';
+	import { javascript } from '@codemirror/lang-javascript';
+	import { onMount } from 'svelte';
+
 	interface Props {
 		title: string;
 		onapply(text: string): void;
 	}
 	const { title, onapply }: Props = $props();
-	let text = $state('');
+	let codeDiv = $state<HTMLElement | undefined>();
+	let view: EditorView;
+
+	onMount(() => {
+		view = new EditorView({
+			doc: '',
+			parent: codeDiv,
+			extensions: [basicSetup, javascript()]
+		});
+	});
 </script>
 
 <div class="function">
-	<label
-		><h2>{title}</h2>
-		<textarea bind:value={text}></textarea>
-	</label>
-	<button onclick={() => onapply(text)}>Apply</button>
+	<h2>{title}</h2>
+	<div bind:this={codeDiv}></div>
+	<button onclick={() => onapply(view.state.doc.toString())}>Apply</button>
 </div>
 
 <style>
 	.function {
 		display: flex;
 		flex-direction: column;
-	}
-
-	.function textarea {
-		width: 100%;
-		height: 99px;
 	}
 </style>
