@@ -2,8 +2,10 @@
 	import Handler from './Handler.svelte';
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
+	import lzString from 'lz-string';
+	import { goto } from '$app/navigation';
 
-	let { qbead = $bindable(), index, api, apiArg } = $props();
+	let { qbead = $bindable(), handlerList, index, api, apiArg } = $props();
 	async function connectQBead() {
 		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
@@ -68,8 +70,13 @@
 	{/if}
 	<Handler
 		title="onAccelUpdate"
+		initText={handlerList[index].onAccelUpdate}
 		onapply={(text) => {
 			const func = new Function(apiArg, text);
+			handlerList[index].onAccelUpdate = text;
+			const hash = lzString.compressToEncodedURIComponent(JSON.stringify(handlerList));
+			goto('#' + hash);
+
 			qbead.onAccelUpdate = () => {
 				func({ ...api, self: index });
 			};
@@ -77,8 +84,13 @@
 	/>
 	<Handler
 		title="onTap"
+		initText={handlerList[index].onTap}
 		onapply={(text) => {
 			const func = new Function(apiArg, text);
+			handlerList[index].onTap = text;
+			const hash = lzString.compressToEncodedURIComponent(JSON.stringify(handlerList));
+			goto('#' + hash);
+
 			qbead.onTap = () => {
 				func({ ...api, self: index });
 			};

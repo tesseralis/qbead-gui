@@ -6,15 +6,16 @@
 
 	interface Props {
 		title: string;
+		initText: string;
 		onapply(text: string): void;
 	}
-	const { title, onapply }: Props = $props();
+	const { title, initText, onapply }: Props = $props();
 	let codeDiv = $state<HTMLElement | undefined>();
 	let view: EditorView;
 
 	onMount(() => {
 		view = new EditorView({
-			doc: '',
+			doc: initText,
 			parent: codeDiv,
 			extensions: [basicSetup, javascript()]
 		});
