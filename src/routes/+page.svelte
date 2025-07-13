@@ -21,17 +21,17 @@
 
 	let qBeads = $state<QBeadState[]>([]);
 
-	function getAccel(id: string) {
-		return qBeads.find((qbead) => qbead.id === id)?.accel;
+	function getAccel(index: number) {
+		return qBeads[index]?.accel;
 	}
 
 	async function setLightByAngle(
-		id: string,
+		index: number,
 		theta: number,
 		phi: number,
 		color: ColorRepresentation
 	) {
-		const qBead = qBeads.find((qbead) => qbead.id === id);
+		const qBead = qBeads[index];
 		if (!qBead) {
 			return;
 		}
@@ -65,7 +65,7 @@
 	<button onclick={addPanel}>+ Add Panel</button>
 	<div class="qBeadPanels">
 		{#each qBeads as qbead, i}
-			<QBeadPanel bind:qbead={qBeads[i]} {api} {apiArg} />
+			<QBeadPanel index={i} bind:qbead={qBeads[i]} {api} {apiArg} />
 		{/each}
 	</div>
 </div>

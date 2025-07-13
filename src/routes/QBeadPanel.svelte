@@ -3,7 +3,7 @@
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
 
-	let { qbead = $bindable(), api, apiArg } = $props();
+	let { qbead = $bindable(), index, api, apiArg } = $props();
 	async function connectQBead() {
 		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
@@ -59,7 +59,7 @@
 		<p>Loading...</p>
 	{:else}
 		<h3>{qbead.name}</h3>
-		<p>{qbead.id}<button onclick={() => navigator.clipboard.writeText(qbead.id)}>copy</button></p>
+		<p>{qbead.id}</p>
 		<button onclick={() => qbead.onTap?.()}>Tap</button>
 		<p>
 			x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(3)}
@@ -71,7 +71,7 @@
 		onapply={(text) => {
 			const func = new Function(apiArg, text);
 			qbead.onAccelUpdate = () => {
-				func({ ...api, self: qbead.id });
+				func({ ...api, self: index });
 			};
 		}}
 	/>
@@ -80,7 +80,7 @@
 		onapply={(text) => {
 			const func = new Function(apiArg, text);
 			qbead.onTap = () => {
-				func({ ...api, self: qbead.id });
+				func({ ...api, self: index });
 			};
 		}}
 	/>
