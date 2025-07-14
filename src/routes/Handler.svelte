@@ -7,8 +7,6 @@
 	interface Props {
 		title: string;
 		text: string;
-		// initText: string;
-		// onapply(text: string): void;
 	}
 	let { title, text = $bindable('') }: Props = $props();
 	let codeDiv = $state<HTMLElement | undefined>();
