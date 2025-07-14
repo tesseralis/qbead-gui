@@ -2,8 +2,10 @@
 	import Handler from './Handler.svelte';
 	import BlochSphere from './BlochSphere.svelte';
 	import { BlochVector } from '@qbead/bloch-sphere';
+	import lzString from 'lz-string';
+	import { goto } from '$app/navigation';
 
-	let { qbead = $bindable(), index, api, apiArg } = $props();
+	let { qbead = $bindable(), handlerList = $bindable([]), index, api, apiArg } = $props();
 	async function connectQBead() {
 		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
@@ -66,24 +68,24 @@
 		</p>
 		<BlochSphere accel={qbead.accel} sphereCoord={qbead.sphereCoord} color={qbead.color} />
 	{/if}
-	<Handler
-		title="onAccelUpdate"
-		onapply={(text) => {
-			const func = new Function(apiArg, text);
-			qbead.onAccelUpdate = () => {
-				func({ ...api, self: index });
-			};
-		}}
-	/>
-	<Handler
-		title="onTap"
-		onapply={(text) => {
-			const func = new Function(apiArg, text);
-			qbead.onTap = () => {
-				func({ ...api, self: index });
-			};
-		}}
-	/>
+	{#each ['onAccelUpdate', 'onTap'] as handlerName}
+		<Handler
+			title={handlerName}
+			bind:text={
+				() => handlerList[index][handlerName] || '',
+				(text) => {
+					handlerList[index][handlerName] = text;
+					const hash = lzString.compressToEncodedURIComponent(JSON.stringify(handlerList));
+					goto('#' + hash);
+
+					const func = new Function(apiArg, text);
+					qbead[handlerName] = () => {
+						func({ ...api, self: index });
+					};
+				}
+			}
+		/>
+	{/each}
 </section>
 
 <style>
