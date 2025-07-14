@@ -23,6 +23,7 @@
 	{:else if loading}
 		<p>Loading...</p>
 	{:else}
+		<h3>qBeads[{index}]</h3>
 		<!-- <h3>{qbead.name}</h3>
 		<p>{qbead.id}</p> -->
 		<!-- The 'tap' hasn't been implemented in the QBead firmware, so mock it out here. -->
@@ -48,6 +49,10 @@
 </section>
 
 <style>
+	h3 {
+		font-size: 1.25rem;
+		font-family: monospace;
+	}
 	.qBeadPanel {
 		padding: 1rem;
 		border: 1px solid black;

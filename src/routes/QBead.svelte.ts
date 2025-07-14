@@ -1,5 +1,5 @@
 import { BlochVector } from '@qbead/bloch-sphere';
-import type { Color } from 'three';
+import { Color, type ColorRepresentation } from 'three';
 
 const serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
@@ -73,8 +73,8 @@ export default class QBead {
 		return this.#color;
 	}
 
-	async setColor(value: Color) {
-		this.#color = value;
+	async setColor(value: ColorRepresentation) {
+		this.#color = new Color(value);
 		let colorBytes = Uint8Array.of(
 			Math.floor(this.#color.r * 255),
 			Math.floor(this.#color.g * 255),
