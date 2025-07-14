@@ -18,7 +18,7 @@ export default class QBead {
 	#accel: BlochVector = $state(BlochVector.from(0, 0, -1));
 	#sphereCoord?: BlochVector = $state();
 	#color?: Color = $state();
-	#handlers: any;
+	handlers: any = $state();
 
 	#sphCharacteristic: BluetoothRemoteGATTCharacteristic;
 	#colCharacteristic: BluetoothRemoteGATTCharacteristic;
@@ -29,7 +29,7 @@ export default class QBead {
 		colCharacteristic,
 		accCharacteristic
 	}: ConstructorParams) {
-		this.#handlers = handlers;
+		this.handlers = handlers;
 		this.#sphCharacteristic = sphCharacteristic;
 		this.#colCharacteristic = colCharacteristic;
 
@@ -37,7 +37,7 @@ export default class QBead {
 			new Uint8Array(event.target.value.buffer).reverse();
 			let value = event.target.value;
 			this.#accel = BlochVector.from(value.getFloat32(0), value.getFloat32(4), value.getFloat32(8));
-			this.#handlers?.onAccelUpdate();
+			this.handlers?.onAccelUpdate();
 		});
 	}
 

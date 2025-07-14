@@ -31,6 +31,16 @@
 			return handlerFuncs;
 		})
 	);
+
+	// TODO this feels like a huge hack. There's got to be a more elegant way to do this.
+	$effect(() => {
+		handlerFuncs.forEach((funcs, i) => {
+			if (qBeads[i]) {
+				qBeads[i].handlers = funcs;
+			}
+		});
+	});
+
 	function addPanel() {
 		handlerList.push({});
 	}
