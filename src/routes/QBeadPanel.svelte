@@ -5,7 +5,7 @@
 	import lzString from 'lz-string';
 	import { goto } from '$app/navigation';
 
-	let { qbead = $bindable(), handlerList = $bindable([]), index, api, apiArg } = $props();
+	let { qbead = $bindable(), handlerList = $bindable([]), handlerFuncs, index } = $props();
 	async function connectQBead() {
 		let serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
@@ -40,7 +40,7 @@
 			new Uint8Array(event.target.value.buffer).reverse();
 			let value = event.target.value;
 			qbead.accel = BlochVector.from(value.getFloat32(0), value.getFloat32(4), value.getFloat32(8));
-			qbead.onAccelUpdate?.();
+			handlerFuncs?.onAccelUpdate();
 		});
 
 		qbead = {
@@ -62,7 +62,7 @@
 	{:else}
 		<h3>{qbead.name}</h3>
 		<p>{qbead.id}</p>
-		<button onclick={() => qbead.onTap?.()}>Tap</button>
+		<button onclick={() => handlerFuncs.onTap?.()}>Tap</button>
 		<p>
 			x: {qbead.accel.x.toFixed(3)}, y: {qbead.accel.y.toFixed(3)}, z: {qbead.accel.z.toFixed(3)}
 		</p>
@@ -77,11 +77,6 @@
 					handlerList[index][handlerName] = text;
 					const hash = lzString.compressToEncodedURIComponent(JSON.stringify(handlerList));
 					goto('#' + hash);
-
-					const func = new Function(apiArg, text);
-					qbead[handlerName] = () => {
-						func({ ...api, self: index });
-					};
 				}
 			}
 		/>

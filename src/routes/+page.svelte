@@ -16,8 +16,6 @@
 		sphCharacteristic?: any;
 		accCharacteristic?: any;
 		colCharacteristic?: any;
-		onTap?: Function;
-		onAccelUpdate?: Function;
 	}
 
 	interface Handlers {
@@ -25,9 +23,27 @@
 		onAccelUpdate?: string;
 	}
 
+	interface HandlerFuncs {
+		onTap?: Function;
+		onAccelUpdate?: Function;
+	}
+
 	const hash = window.location.hash.slice(1);
 	const handlerText = JSON.parse(lzString.decompressFromEncodedURIComponent(hash)) ?? [];
 	let handlerList = $state<Handlers[]>(handlerText);
+	const handlerFuncs = $derived(
+		handlerList.map((handlers, index) => {
+			const handlerFuncs: HandlerFuncs = {};
+			for (let funcName of ['onTap', 'onAccelUpdate'] as const) {
+				const func = new Function(apiArg, handlers[funcName] || '');
+				handlerFuncs[funcName] = () => {
+					func({ ...api, self: index });
+				};
+			}
+			return handlerFuncs;
+		})
+	);
+
 	let qBeads = $state<QBeadState[]>(handlerText.map(() => ({ id: '' })));
 
 	function getAccel(index: number) {
@@ -75,7 +91,12 @@
 	<button onclick={addPanel}>+ Add Panel</button>
 	<div class="qBeadPanels">
 		{#each handlerList as _, i}
-			<QBeadPanel index={i} bind:qbead={qBeads[i]} {api} {apiArg} bind:handlerList />
+			<QBeadPanel
+				index={i}
+				bind:qbead={qBeads[i]}
+				handlerFuncs={handlerFuncs[i]}
+				bind:handlerList
+			/>
 		{/each}
 	</div>
 </div>
