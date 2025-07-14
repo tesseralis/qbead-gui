@@ -5,6 +5,7 @@
 	import { Color, type ColorRepresentation } from 'three';
 	import QBeadPanel from './QBeadPanel.svelte';
 	import lzString from 'lz-string';
+	import { onMount } from 'svelte';
 
 	interface QBeadState {
 		id: string;
@@ -27,8 +28,9 @@
 
 	const hash = window.location.hash.slice(1);
 	let handlerList = $state<Handlers[]>(
-		JSON.parse(lzString.decompressFromEncodedURIComponent(hash))
+		JSON.parse(lzString.decompressFromEncodedURIComponent(hash)) ?? []
 	);
+	// FIXME
 	let qBeads = $state<QBeadState[]>(handlerList.map(() => ({ id: '' })));
 
 	function getAccel(index: number) {
@@ -75,8 +77,8 @@
 	<Docs />
 	<button onclick={addPanel}>+ Add Panel</button>
 	<div class="qBeadPanels">
-		{#each qBeads as qbead, i}
-			<QBeadPanel index={i} bind:qbead={qBeads[i]} {api} {apiArg} {handlerList} />
+		{#each handlerList as _, i}
+			<QBeadPanel index={i} bind:qbead={qBeads[i]} {api} {apiArg} bind:handlerList />
 		{/each}
 	</div>
 </div>

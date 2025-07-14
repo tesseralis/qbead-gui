@@ -6,16 +6,17 @@
 
 	interface Props {
 		title: string;
-		initText: string;
-		onapply(text: string): void;
+		text: string;
+		// initText: string;
+		// onapply(text: string): void;
 	}
-	const { title, initText, onapply }: Props = $props();
+	let { title, text = $bindable('') }: Props = $props();
 	let codeDiv = $state<HTMLElement | undefined>();
 	let view: EditorView;
 
 	onMount(() => {
 		view = new EditorView({
-			doc: initText,
+			doc: text,
 			parent: codeDiv,
 			extensions: [basicSetup, javascript()]
 		});
@@ -25,7 +26,7 @@
 <div class="function">
 	<h2>{title}</h2>
 	<div bind:this={codeDiv}></div>
-	<button onclick={() => onapply(view.state.doc.toString())}>Apply</button>
+	<button onclick={() => (text = view.state.doc.toString())}>Apply</button>
 </div>
 
 <style>
