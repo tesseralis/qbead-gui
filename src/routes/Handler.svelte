@@ -30,6 +30,10 @@
 </div>
 
 <style>
+	h2 {
+		font-size: 1rem;
+		font-family: monospace;
+	}
 	.function {
 		display: flex;
 		flex-direction: column;
