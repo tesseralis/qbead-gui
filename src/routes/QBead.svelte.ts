@@ -3,6 +3,7 @@ import { Color, type ColorRepresentation } from 'three';
 
 const serviceUuid = 'e30c1fc6-359c-12be-2544-63d6aa088d45';
 
+const tapUuid = 'e30c1fca-359c-12be-2544-63d6aa088d45';
 const accUuid = 'e30c1fc9-359c-12be-2544-63d6aa088d45';
 const sphUuid = 'e30c1fc8-359c-12be-2544-63d6aa088d45';
 const colUuid = 'e30c1fc7-359c-12be-2544-63d6aa088d45';
@@ -12,10 +13,12 @@ interface ConstructorParams {
 	sphCharacteristic: BluetoothRemoteGATTCharacteristic;
 	colCharacteristic: BluetoothRemoteGATTCharacteristic;
 	accCharacteristic: BluetoothRemoteGATTCharacteristic;
+	tapCharacteristic: BluetoothRemoteGATTCharacteristic;
 }
 
 export default class QBead {
 	#accel: BlochVector = $state(BlochVector.from(0, 0, -1));
+	#tap: BlochVector = $state(BlochVector.from(0, 0, -1));
 	#sphereCoord?: BlochVector = $state();
 	#color?: Color = $state();
 	handlers: any = $state();
@@ -27,7 +30,8 @@ export default class QBead {
 		handlers,
 		sphCharacteristic,
 		colCharacteristic,
-		accCharacteristic
+		accCharacteristic,
+		tapCharacteristic
 	}: ConstructorParams) {
 		this.handlers = handlers;
 		this.#sphCharacteristic = sphCharacteristic;
@@ -38,6 +42,13 @@ export default class QBead {
 			let value = event.target.value;
 			this.#accel = BlochVector.from(value.getFloat32(0), value.getFloat32(4), value.getFloat32(8));
 			this.handlers?.onAccelUpdate();
+		});
+
+		tapCharacteristic.addEventListener('characteristicvaluechanged', (event: any) => {
+			new Uint8Array(event.target.value.buffer).reverse();
+			let value = event.target.value;
+			this.#tap = BlochVector.from(value.getFloat32(0), value.getFloat32(4), value.getFloat32(8));
+			this.handlers?.onTap();
 		});
 	}
 
@@ -61,12 +72,24 @@ export default class QBead {
 		let sphCharacteristic = await service.getCharacteristic(sphUuid);
 		let colCharacteristic = await service.getCharacteristic(colUuid);
 		let accCharacteristic = await service.getCharacteristic(accUuid);
+		let tapCharacteristic = await service.getCharacteristic(tapUuid);
 		await accCharacteristic.startNotifications();
-		return new QBead({ handlers, sphCharacteristic, colCharacteristic, accCharacteristic });
+		await tapCharacteristic.startNotifications();
+		return new QBead({
+			handlers,
+			sphCharacteristic,
+			colCharacteristic,
+			accCharacteristic,
+			tapCharacteristic
+		});
 	}
 
 	get accel() {
 		return this.#accel;
+	}
+
+	get tap() {
+		return this.#tap;
 	}
 
 	get color() {

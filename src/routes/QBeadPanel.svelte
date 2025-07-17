@@ -26,8 +26,6 @@
 		<h3>qBeads[{index}]</h3>
 		<!-- <h3>{qbead.name}</h3>
 		<p>{qbead.id}</p> -->
-		<!-- The 'tap' hasn't been implemented in the QBead firmware, so mock it out here. -->
-		<button onclick={() => handlerFuncs.onTap?.()}>Tap</button>
 		<p>
 			x: {qBead.accel.x.toFixed(3)}, y: {qBead.accel.y.toFixed(3)}, z: {qBead.accel.z.toFixed(3)}
 		</p>
