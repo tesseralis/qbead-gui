@@ -17,7 +17,7 @@
 			</a>.
 		</li>
 		<li>
-			<code>sphereCoords</code> - the currently highlighted spherical coordinate of the QBead as a
+			<code>sphereCoord</code> - the currently highlighted spherical coordinate of the QBead as a
 			<a href="https://qbead.gitbook.io/bloch-sphere/classes/blochvector">
 				<code>BlochVector</code>
 			</a>.
@@ -26,7 +26,7 @@
 			<code>color</code> - the current color of the QBead.
 		</li>
 		<li>
-			<code>setSphereCoords(value: BlochVector)</code> - set the sphere coordinates of the QBead to the
+			<code>setSphereCoord(value: BlochVector)</code> - set the sphere coordinates of the QBead to the
 			given value.
 		</li>
 		<li>
