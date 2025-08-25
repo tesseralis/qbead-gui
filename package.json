@@ -22,7 +22,7 @@
 		"@sveltejs/adapter-netlify": "^5.0.2",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
-		"@types/three": "^0.178.0",
+		"@types/three": "^0.175.0",
 		"@vitest/browser": "^3.2.3",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
@@ -46,7 +46,7 @@
 		"@types/web-bluetooth": "^0.0.21",
 		"codemirror": "^6.0.2",
 		"lz-string": "^1.5.0",
-		"three": "^0.178.0",
+		"three": "^0.175.0",
 		"uuid": "^11.1.0"
 	}
 }
